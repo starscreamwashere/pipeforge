@@ -22,4 +22,13 @@ public class QueuePublisher {
     public void publishReady(UUID taskRunId) {
         redisTemplate.opsForList().leftPush(QueueKeys.READY_QUEUE, taskRunId.toString());
     }
+
+    /**
+     * ZADD a task-run ID onto {@code queue:retry}, scored by the epoch-second at
+     * which it becomes eligible. A scanner (Milestone 7) moves due entries back
+     * onto the ready queue.
+     */
+    public void publishRetry(UUID taskRunId, long readyAtEpochSeconds) {
+        redisTemplate.opsForZSet().add(QueueKeys.RETRY_QUEUE, taskRunId.toString(), readyAtEpochSeconds);
+    }
 }

@@ -10,6 +10,7 @@ import java.util.Set;
 
 import static com.pipeforge.execution.entity.ExecutionStatus.CANCELLED;
 import static com.pipeforge.execution.entity.ExecutionStatus.FAILED;
+import static com.pipeforge.execution.entity.ExecutionStatus.FAILED_PERMANENTLY;
 import static com.pipeforge.execution.entity.ExecutionStatus.PENDING;
 import static com.pipeforge.execution.entity.ExecutionStatus.QUEUED;
 import static com.pipeforge.execution.entity.ExecutionStatus.RETRYING;
@@ -39,9 +40,10 @@ public class ExecutionStateMachine {
         ALLOWED.put(QUEUED, Set.of(RUNNING, CANCELLED));
         ALLOWED.put(RUNNING, Set.of(SUCCESS, FAILED, CANCELLED, RETRYING));
         ALLOWED.put(RETRYING, Set.of(QUEUED, CANCELLED));
-        ALLOWED.put(FAILED, Set.of(RETRYING));
+        ALLOWED.put(FAILED, Set.of(RETRYING, FAILED_PERMANENTLY));
         ALLOWED.put(SUCCESS, Set.of());
         ALLOWED.put(CANCELLED, Set.of());
+        ALLOWED.put(FAILED_PERMANENTLY, Set.of());
     }
 
     public boolean canTransition(ExecutionStatus from, ExecutionStatus to) {

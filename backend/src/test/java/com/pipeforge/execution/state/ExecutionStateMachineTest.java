@@ -1,6 +1,7 @@
 package com.pipeforge.execution.state;
 
 import com.pipeforge.exception.InvalidStateTransitionException;
+import com.pipeforge.execution.entity.ExecutionStatus;
 import org.junit.jupiter.api.Test;
 
 import static com.pipeforge.execution.entity.ExecutionStatus.CANCELLED;
@@ -32,6 +33,13 @@ class ExecutionStateMachineTest {
         assertThat(stateMachine.canTransition(RUNNING, RETRYING)).isTrue();
         assertThat(stateMachine.canTransition(RETRYING, QUEUED)).isTrue();
         assertThat(stateMachine.canTransition(FAILED, RETRYING)).isTrue();
+    }
+
+    @Test
+    void allowsDeadLetterAndTreatsItAsTerminal() {
+        assertThat(stateMachine.canTransition(FAILED, ExecutionStatus.FAILED_PERMANENTLY)).isTrue();
+        assertThat(ExecutionStatus.FAILED_PERMANENTLY.isTerminal()).isTrue();
+        assertThat(stateMachine.canTransition(ExecutionStatus.FAILED_PERMANENTLY, RETRYING)).isFalse();
     }
 
     @Test

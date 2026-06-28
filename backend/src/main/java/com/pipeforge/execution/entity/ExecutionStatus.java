@@ -11,9 +11,11 @@ public enum ExecutionStatus {
     SUCCESS,
     FAILED,
     CANCELLED,
-    RETRYING;
+    RETRYING,
+    /** Dead-letter: retries exhausted (App Flow §5.8). */
+    FAILED_PERMANENTLY;
 
     public boolean isTerminal() {
-        return this == SUCCESS || this == CANCELLED;
+        return this == SUCCESS || this == CANCELLED || this == FAILED_PERMANENTLY;
     }
 }
