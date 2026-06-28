@@ -39,6 +39,11 @@ class JwtServiceTest {
         assertThat(token).isNotBlank();
         assertThat(jwtService.isValid(token)).isTrue();
 
+        // Header algorithm must be HS256 (Technical Requirements §3).
+        String header = new String(java.util.Base64.getUrlDecoder()
+                .decode(token.split("\\.")[0]), java.nio.charset.StandardCharsets.UTF_8);
+        assertThat(header).contains("\"alg\":\"HS256\"");
+
         Claims claims = jwtService.parse(token);
         assertThat(claims.getSubject()).isEqualTo(user.getId().toString());
         assertThat(claims.get("email", String.class)).isEqualTo("ada@pipeforge.dev");

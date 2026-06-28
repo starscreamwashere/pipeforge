@@ -41,7 +41,9 @@ public class JwtService {
                 .claim("role", user.getRole().name())
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(expiry))
-                .signWith(key)
+                // Pin HS256 per Technical Requirements §3 (jjwt would otherwise
+                // auto-select a stronger HMAC based on key length).
+                .signWith(key, Jwts.SIG.HS256)
                 .compact();
     }
 

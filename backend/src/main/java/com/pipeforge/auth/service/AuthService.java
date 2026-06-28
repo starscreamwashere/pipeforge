@@ -4,6 +4,7 @@ import com.pipeforge.auth.dto.AuthResponse;
 import com.pipeforge.auth.dto.LoginRequest;
 import com.pipeforge.auth.dto.RefreshRequest;
 import com.pipeforge.auth.dto.SignupRequest;
+import com.pipeforge.auth.dto.UserResponse;
 import com.pipeforge.auth.entity.RefreshToken;
 import com.pipeforge.auth.entity.Role;
 import com.pipeforge.auth.entity.User;
@@ -12,6 +13,7 @@ import com.pipeforge.auth.repository.RefreshTokenRepository;
 import com.pipeforge.auth.repository.UserRepository;
 import com.pipeforge.auth.security.JwtService;
 import com.pipeforge.config.JwtProperties;
+import com.pipeforge.exception.ResourceNotFoundException;
 import com.pipeforge.exception.UnauthorizedException;
 import com.pipeforge.exception.ValidationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.security.SecureRandom;
 import java.time.Instant;
 import java.util.Base64;
+import java.util.UUID;
 
 /**
  * Authentication use-cases (App Flow §4.2–4.3, Technical Requirements §3):
@@ -92,6 +95,13 @@ public class AuthService {
         // Rotate: invalidate the presented token and issue a fresh pair.
         stored.setRevoked(true);
         return issueTokens(stored.getUser());
+    }
+
+    @Transactional(readOnly = true)
+    public UserResponse currentUser(UUID userId) {
+        return userRepository.findById(userId)
+                .map(userMapper::toResponse)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
 
     @Transactional
