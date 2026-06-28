@@ -37,6 +37,12 @@ public class GlobalExceptionHandler {
         return build(HttpStatus.BAD_REQUEST, "PIPELINE_CYCLE", ex.getMessage(), request);
     }
 
+    @ExceptionHandler(InvalidStateTransitionException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidTransition(InvalidStateTransitionException ex,
+                                                                 HttpServletRequest request) {
+        return build(HttpStatus.CONFLICT, "INVALID_STATE_TRANSITION", ex.getMessage(), request);
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleBeanValidation(MethodArgumentNotValidException ex,
                                                               HttpServletRequest request) {
