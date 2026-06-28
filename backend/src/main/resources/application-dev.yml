@@ -1,0 +1,12 @@
+# Local development profile.
+spring:
+  jpa:
+    properties:
+      hibernate:
+        format_sql: true
+
+logging:
+  level:
+    com.pipeforge: DEBUG
+    org.springframework.security: INFO
+    org.hibernate.SQL: DEBUG

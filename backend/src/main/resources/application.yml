@@ -1,0 +1,60 @@
+spring:
+  application:
+    name: pipeforge
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/pipeforge}
+    username: ${DB_USERNAME:pipeforge}
+    password: ${DB_PASSWORD:pipeforge}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+
+server:
+  port: ${APP_PORT:8080}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: when_authorized
+  prometheus:
+    metrics:
+      export:
+        enabled: ${PROMETHEUS_ENABLED:true}
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+
+# PipeForge application-specific configuration (bound via @ConfigurationProperties).
+pipeforge:
+  security:
+    jwt:
+      # HS256 requires a secret of at least 256 bits (32 chars). Override in every
+      # non-dev environment via the JWT_SECRET environment variable.
+      secret: ${JWT_SECRET:dev-only-insecure-secret-change-me-0123456789abcdef}
+      access-token-expiry: ${JWT_EXPIRY:900000}      # 15 minutes (ms)
+      refresh-token-expiry: ${REFRESH_TOKEN_EXPIRY:604800000}  # 7 days (ms)
