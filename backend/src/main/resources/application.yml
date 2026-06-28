@@ -28,6 +28,10 @@ spring:
     redis:
       host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:6379}
+      # Redis is used via RedisTemplate, not Spring Data repositories — disable
+      # repository scanning so JPA repositories aren't probed as Redis ones.
+      repositories:
+        enabled: false
 
 server:
   port: ${APP_PORT:8080}
