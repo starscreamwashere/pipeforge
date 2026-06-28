@@ -61,6 +61,12 @@ springdoc:
 
 # PipeForge application-specific configuration (bound via @ConfigurationProperties).
 pipeforge:
+  worker:
+    # Embedded worker runtime: the BRPOP consumer + retry-queue scanner.
+    # Enable for real runs (WORKER_CONSUMER_ENABLED=true); off by default so tests
+    # can inspect the queues deterministically.
+    consumer:
+      enabled: ${WORKER_CONSUMER_ENABLED:false}
   security:
     cors:
       # Comma-separated list of allowed front-end origins (Technical Requirements §3).
