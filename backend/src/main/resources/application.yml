@@ -52,6 +52,9 @@ springdoc:
 # PipeForge application-specific configuration (bound via @ConfigurationProperties).
 pipeforge:
   security:
+    cors:
+      # Comma-separated list of allowed front-end origins (Technical Requirements §3).
+      allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173}
     jwt:
       # HS256 requires a secret of at least 256 bits (32 chars). Override in every
       # non-dev environment via the JWT_SECRET environment variable.
