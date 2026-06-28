@@ -65,7 +65,7 @@ class PipelineControllerIT {
         // create
         ResponseEntity<PipelineResponse> created = rest.exchange(
                 "/api/v1/pipelines", HttpMethod.POST,
-                new HttpEntity<>(new CreatePipelineRequest("etl", "nightly", "0 0 2 * * *", null), auth(token)),
+                new HttpEntity<>(new CreatePipelineRequest("etl", "nightly", "0 0 2 * * ?", null), auth(token)),
                 PipelineResponse.class);
         assertThat(created.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         assertThat(created.getBody()).isNotNull();

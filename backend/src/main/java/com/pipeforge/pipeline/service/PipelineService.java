@@ -11,6 +11,7 @@ import com.pipeforge.pipeline.entity.PipelineStatus;
 import com.pipeforge.pipeline.entity.RetryPolicy;
 import com.pipeforge.pipeline.mapper.PipelineMapper;
 import com.pipeforge.pipeline.repository.PipelineRepository;
+import com.pipeforge.scheduler.PipelineSchedulerService;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,13 +25,16 @@ public class PipelineService {
     private final PipelineRepository pipelineRepository;
     private final UserRepository userRepository;
     private final PipelineMapper pipelineMapper;
+    private final PipelineSchedulerService schedulerService;
 
     public PipelineService(PipelineRepository pipelineRepository,
                            UserRepository userRepository,
-                           PipelineMapper pipelineMapper) {
+                           PipelineMapper pipelineMapper,
+                           PipelineSchedulerService schedulerService) {
         this.pipelineRepository = pipelineRepository;
         this.userRepository = userRepository;
         this.pipelineMapper = pipelineMapper;
+        this.schedulerService = schedulerService;
     }
 
     @Transactional
@@ -44,7 +48,9 @@ public class PipelineService {
         pipeline.setStatus(PipelineStatus.DRAFT);
         pipeline.setVersion(1);
 
-        return pipelineMapper.toResponse(pipelineRepository.save(pipeline));
+        Pipeline saved = pipelineRepository.save(pipeline);
+        schedulerService.sync(saved);
+        return pipelineMapper.toResponse(saved);
     }
 
     @Transactional(readOnly = true)
@@ -61,7 +67,9 @@ public class PipelineService {
     public PipelineResponse update(UUID id, UpdatePipelineRequest request) {
         Pipeline pipeline = findOrThrow(id);
         pipelineMapper.updateEntity(request, pipeline);
-        return pipelineMapper.toResponse(pipelineRepository.save(pipeline));
+        Pipeline saved = pipelineRepository.save(pipeline);
+        schedulerService.sync(saved);
+        return pipelineMapper.toResponse(saved);
     }
 
     @Transactional
@@ -69,6 +77,7 @@ public class PipelineService {
         Pipeline pipeline = findOrThrow(id);
         pipeline.setDeleted(true);
         pipelineRepository.save(pipeline);
+        schedulerService.unschedule(id);
     }
 
     private Pipeline findOrThrow(UUID id) {

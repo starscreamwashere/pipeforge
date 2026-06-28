@@ -33,6 +33,7 @@ class PipelineServiceTest {
     @Mock PipelineRepository pipelineRepository;
     @Mock UserRepository userRepository;
     @Mock PipelineMapper pipelineMapper;
+    @Mock com.pipeforge.scheduler.PipelineSchedulerService schedulerService;
 
     @InjectMocks PipelineService pipelineService;
 
