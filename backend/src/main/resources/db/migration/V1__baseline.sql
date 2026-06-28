@@ -1,0 +1,12 @@
+-- PipeForge baseline migration (Milestone 1.2).
+--
+-- Domain tables are introduced in their own milestones:
+--   V2  users / refresh_tokens          (Milestone 2 — Authentication)
+--   V3  pipelines                       (Milestone 3 — Pipeline CRUD)
+--   V4  pipeline_tasks / dependencies   (Milestone 4 — DAG Engine)
+--   V5  pipeline_runs / task_runs       (Milestone 5 — Execution Engine)
+--   ...
+--
+-- This baseline only enables shared extensions used across the schema.
+-- pgcrypto provides gen_random_uuid() for any DB-side UUID defaults.
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
