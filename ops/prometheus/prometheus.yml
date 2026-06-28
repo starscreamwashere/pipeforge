@@ -1,0 +1,16 @@
+# Prometheus scrape configuration for PipeForge (Technical Requirements §13).
+# The pipeforge-app target resolves once the app service is enabled (Milestone 10);
+# Prometheus boots fine while that target is unreachable.
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: prometheus
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: pipeforge-app
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ['pipeforge-app:8080']
