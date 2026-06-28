@@ -62,3 +62,6 @@ logs/
 .data/
 pgdata/
 redisdata/
+
+# ─── Tooling runtime artifacts ────────────────────────────
+.claude/scheduled_tasks.lock
