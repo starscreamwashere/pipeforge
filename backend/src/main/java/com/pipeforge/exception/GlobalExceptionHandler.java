@@ -32,6 +32,11 @@ public class GlobalExceptionHandler {
         return build(HttpStatus.BAD_REQUEST, "VALIDATION_ERROR", ex.getMessage(), request);
     }
 
+    @ExceptionHandler(PipelineCycleException.class)
+    public ResponseEntity<ErrorResponse> handleCycle(PipelineCycleException ex, HttpServletRequest request) {
+        return build(HttpStatus.BAD_REQUEST, "PIPELINE_CYCLE", ex.getMessage(), request);
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleBeanValidation(MethodArgumentNotValidException ex,
                                                               HttpServletRequest request) {
