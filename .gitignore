@@ -1,0 +1,64 @@
+# ─── Java / Maven (backend) ───────────────────────────────
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+hs_err_pid*
+replay_pid*
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.properties
+
+# ─── Node / React (frontend) ──────────────────────────────
+node_modules/
+dist/
+dist-ssr/
+build/
+.next/
+*.local
+.vite/
+coverage/
+
+# ─── Environment & secrets ────────────────────────────────
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# ─── IDE / editor ─────────────────────────────────────────
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+*.code-workspace
+.settings/
+.project
+.classpath
+.factorypath
+
+# ─── OS ───────────────────────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
+
+# ─── Logs & runtime ───────────────────────────────────────
+*.log
+logs/
+*.pid
+*.seed
+*.pid.lock
+
+# ─── Docker volumes (local data) ──────────────────────────
+.data/
+pgdata/
+redisdata/
