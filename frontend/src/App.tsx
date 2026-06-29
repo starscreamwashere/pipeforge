@@ -1,34 +1,42 @@
-const EXECUTION_STATES = [
-  { label: 'PENDING', token: 'var(--state-pending)' },
-  { label: 'QUEUED', token: 'var(--state-queued)' },
-  { label: 'RUNNING', token: 'var(--state-running)' },
-  { label: 'SUCCESS', token: 'var(--state-success)' },
-  { label: 'FAILED', token: 'var(--state-failed)' },
-  { label: 'RETRYING', token: 'var(--state-retrying)' },
-  { label: 'CANCELLED', token: 'var(--state-cancelled)' },
-] as const
+import { Navigate, Route, Routes } from 'react-router-dom'
+import { AppLayout } from '@/components/layout/AppLayout'
+import { ProtectedRoute } from '@/routes/ProtectedRoute'
+import Landing from '@/pages/Landing'
+import Login from '@/pages/Login'
+import Signup from '@/pages/Signup'
+import Dashboard from '@/pages/Dashboard'
+import Pipelines from '@/pages/Pipelines'
+import PipelineDetail from '@/pages/PipelineDetail'
+import Executions from '@/pages/Executions'
+import ExecutionDetail from '@/pages/ExecutionDetail'
+import Workers from '@/pages/Workers'
+import Logs from '@/pages/Logs'
+import Metrics from '@/pages/Metrics'
+import Settings from '@/pages/Settings'
 
 function App() {
   return (
-    <div className="flex min-h-svh flex-col items-center justify-center gap-6 bg-background px-8 text-foreground">
-      <div className="text-center">
-        <h1 className="text-[32px] font-bold tracking-tight">PipeForge</h1>
-        <p className="mt-2 text-muted-foreground">
-          Data pipeline orchestration — frontend bootstrap (Milestone 0.3)
-        </p>
-      </div>
-      <div className="flex flex-wrap items-center justify-center gap-2">
-        {EXECUTION_STATES.map((s) => (
-          <span
-            key={s.label}
-            className="rounded-md px-3 py-1 font-mono text-xs font-medium text-background"
-            style={{ backgroundColor: s.token }}
-          >
-            {s.label}
-          </span>
-        ))}
-      </div>
-    </div>
+    <Routes>
+      <Route path="/" element={<Landing />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<Signup />} />
+
+      <Route element={<ProtectedRoute />}>
+        <Route element={<AppLayout />}>
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/pipelines" element={<Pipelines />} />
+          <Route path="/pipelines/:id" element={<PipelineDetail />} />
+          <Route path="/executions" element={<Executions />} />
+          <Route path="/executions/:id" element={<ExecutionDetail />} />
+          <Route path="/workers" element={<Workers />} />
+          <Route path="/logs" element={<Logs />} />
+          <Route path="/metrics" element={<Metrics />} />
+          <Route path="/settings" element={<Settings />} />
+        </Route>
+      </Route>
+
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   )
 }
 
