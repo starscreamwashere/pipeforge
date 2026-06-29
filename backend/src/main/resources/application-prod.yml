@@ -11,6 +11,11 @@ management:
       show-details: never
 
 logging:
+  # Structured JSON logs (Technical Requirements §14) for searchable aggregation.
+  # ECS includes timestamp, level, logger, message, and MDC fields (e.g. taskRunId).
+  structured:
+    format:
+      console: ecs
   level:
     com.pipeforge: INFO
     org.springframework: WARN

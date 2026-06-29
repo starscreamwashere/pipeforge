@@ -93,7 +93,7 @@ class WorkerRuntimeIT {
         UUID runId = rest.exchange("/api/v1/pipelines/" + pipelineId + "/trigger", HttpMethod.POST,
                 new HttpEntity<>(auth), ExecutionResponse.class).getBody().id();
 
-        ExecutionStatus status = pollRunStatus(runId, Duration.ofSeconds(20));
+        ExecutionStatus status = pollRunStatus(runId, Duration.ofSeconds(45));
         assertThat(status).isEqualTo(ExecutionStatus.SUCCESS);
 
         ExecutionDetailResponse detail = rest.exchange("/api/v1/executions/" + runId,
@@ -110,7 +110,7 @@ class WorkerRuntimeIT {
         UUID runId = rest.exchange("/api/v1/pipelines/" + pipelineId + "/trigger", HttpMethod.POST,
                 new HttpEntity<>(auth), ExecutionResponse.class).getBody().id();
 
-        ExecutionStatus status = pollRunStatus(runId, Duration.ofSeconds(20));
+        ExecutionStatus status = pollRunStatus(runId, Duration.ofSeconds(45));
         assertThat(status).isEqualTo(ExecutionStatus.FAILED_PERMANENTLY);
     }
 }

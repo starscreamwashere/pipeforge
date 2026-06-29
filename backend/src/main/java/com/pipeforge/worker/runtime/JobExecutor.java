@@ -8,10 +8,12 @@ import com.pipeforge.execution.repository.PipelineRunRepository;
 import com.pipeforge.execution.repository.TaskRunRepository;
 import com.pipeforge.execution.retry.RetryService;
 import com.pipeforge.execution.state.ExecutionStateMachine;
+import com.pipeforge.metrics.MetricsService;
 import com.pipeforge.pipeline.entity.PipelineDependency;
 import com.pipeforge.pipeline.repository.PipelineDependencyRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
@@ -46,6 +48,7 @@ public class JobExecutor {
     private final ExecutionStateMachine stateMachine;
     private final TaskRunner taskRunner;
     private final WorkerIdentity workerIdentity;
+    private final MetricsService metricsService;
 
     public JobExecutor(TaskRunRepository taskRunRepository,
                        PipelineRunRepository pipelineRunRepository,
@@ -55,7 +58,8 @@ public class JobExecutor {
                        RetryService retryService,
                        ExecutionStateMachine stateMachine,
                        TaskRunner taskRunner,
-                       WorkerIdentity workerIdentity) {
+                       WorkerIdentity workerIdentity,
+                       MetricsService metricsService) {
         this.taskRunRepository = taskRunRepository;
         this.pipelineRunRepository = pipelineRunRepository;
         this.dependencyRepository = dependencyRepository;
@@ -65,10 +69,20 @@ public class JobExecutor {
         this.stateMachine = stateMachine;
         this.taskRunner = taskRunner;
         this.workerIdentity = workerIdentity;
+        this.metricsService = metricsService;
     }
 
     @Transactional
     public void execute(UUID taskRunId) {
+        MDC.put("taskRunId", taskRunId.toString());
+        try {
+            executeInternal(taskRunId);
+        } finally {
+            MDC.remove("taskRunId");
+        }
+    }
+
+    private void executeInternal(UUID taskRunId) {
         String owner = workerIdentity.get();
         String lockKey = distributedLock.jobLockKey(taskRunId);
 
@@ -98,10 +112,16 @@ public class JobExecutor {
             taskRun.setStatus(ExecutionStatus.SUCCESS);
             taskRun.setCompletedAt(Instant.now());
             taskRunRepository.save(taskRun);
+            metricsService.taskSucceeded(Duration.between(taskRun.getStartedAt(), taskRun.getCompletedAt()));
             enqueueReadyChildren(run, taskRun.getTask().getId());
         } catch (RuntimeException ex) {
             log.warn("Task run {} failed: {}", taskRunId, ex.getMessage());
-            retryService.handleFailure(taskRun, ex.getMessage());
+            ExecutionStatus outcome = retryService.handleFailure(taskRun, ex.getMessage());
+            if (outcome == ExecutionStatus.RETRYING) {
+                metricsService.taskRetried();
+            } else {
+                metricsService.taskFailed();
+            }
         }
 
         finalizeRunIfComplete(run);

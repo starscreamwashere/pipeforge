@@ -16,6 +16,7 @@ import com.pipeforge.execution.queue.QueuePublisher;
 import com.pipeforge.execution.repository.PipelineRunRepository;
 import com.pipeforge.execution.repository.TaskRunRepository;
 import com.pipeforge.execution.state.ExecutionStateMachine;
+import com.pipeforge.metrics.MetricsService;
 import com.pipeforge.pipeline.dag.DagAlgorithms;
 import com.pipeforge.pipeline.entity.Pipeline;
 import com.pipeforge.pipeline.entity.PipelineDependency;
@@ -51,6 +52,7 @@ public class ExecutionService {
     private final QueuePublisher queuePublisher;
     private final ExecutionMapper executionMapper;
     private final TaskRunMapper taskRunMapper;
+    private final MetricsService metricsService;
 
     public ExecutionService(PipelineRepository pipelineRepository,
                             PipelineTaskRepository taskRepository,
@@ -60,7 +62,8 @@ public class ExecutionService {
                             ExecutionStateMachine stateMachine,
                             QueuePublisher queuePublisher,
                             ExecutionMapper executionMapper,
-                            TaskRunMapper taskRunMapper) {
+                            TaskRunMapper taskRunMapper,
+                            MetricsService metricsService) {
         this.pipelineRepository = pipelineRepository;
         this.taskRepository = taskRepository;
         this.dependencyRepository = dependencyRepository;
@@ -70,6 +73,7 @@ public class ExecutionService {
         this.queuePublisher = queuePublisher;
         this.executionMapper = executionMapper;
         this.taskRunMapper = taskRunMapper;
+        this.metricsService = metricsService;
     }
 
     @Transactional
@@ -113,6 +117,7 @@ public class ExecutionService {
             }
         }
 
+        metricsService.executionTriggered();
         return executionMapper.toResponse(run);
     }
 
